@@ -1,0 +1,13 @@
+[Unit]
+Description=Blaze Webhook Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/.openclaw/workspace/blaze-os-railway
+ExecStart=/usr/bin/node webhook-server.js
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
