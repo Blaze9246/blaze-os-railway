@@ -1,738 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Blaze OS Enterprise</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
-<style>
-:root{--bg:#07070d;--bg2:#0f0f1a;--bg3:#161625;--bg4:#1d1d30;--accent:#ff6b35;--accent2:#f7931e;--text:#fff;--text2:#7a7a94;--text3:#4a4a60;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
-.mono{font-family:'JetBrains Mono',monospace;}
-.g{background:rgba(15,15,26,.65);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.05);border-radius:14px;transition:all .25s;}
-.g:hover{border-color:rgba(255,107,53,.12);}
-.sb{width:240px;background:rgba(10,10,18,.97);border-right:1px solid rgba(255,255,255,.04);height:100vh;position:fixed;left:0;top:0;z-index:50;transition:transform .3s;overflow-y:auto;display:flex;flex-direction:column;}
-.sb-h{transform:translateX(-240px);}
-.ni{display:flex;align-items:center;gap:10px;padding:9px 16px;color:var(--text2);cursor:pointer;transition:all .2s;border-radius:9px;margin:1px 10px;font-size:13px;font-weight:500;}
-.ni:hover{background:rgba(255,107,53,.07);color:var(--text);}
-.ni.a{background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(247,147,30,.06));color:var(--accent);font-weight:600;}
-.ns{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);padding:18px 16px 6px;}
-.mc{margin-left:240px;min-height:100vh;transition:margin-left .3s;}
-.pg{display:none;padding:20px;max-width:1400px;margin:0 auto;}.pg.a{display:block;}
-.tb{height:56px;background:rgba(7,7,13,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:40;}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none;outline:none;font-family:inherit;}
-.btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
-.btn-p:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(255,107,53,.25);}
-.btn-g{background:rgba(255,255,255,.05);color:var(--text2);border:1px solid rgba(255,255,255,.07);}
-.btn-g:hover{background:rgba(255,255,255,.08);color:var(--text);}
-.btn-d{background:rgba(239,68,68,.1);color:#f87171;}.btn-d:hover{background:rgba(239,68,68,.2);}
-.btn-s{padding:5px 12px;font-size:11px;}.btn-xs{padding:3px 9px;font-size:10px;border-radius:6px;}
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:16px;}
-.mo.show{display:flex;}
-.mo-c{background:var(--bg2);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:24px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;}
-.fi{width:100%;padding:9px 13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border .2s;}
-.fi:focus{border-color:var(--accent);}
-.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
-.fg{margin-bottom:14px;}
-select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%237a7a94' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");background-position:right 10px center;background-repeat:no-repeat;background-size:18px;}
-textarea.fi{min-height:80px;resize:vertical;}
-.term{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#a0ffa0;max-height:320px;overflow-y:auto;line-height:1.6;white-space:pre-wrap;word-break:break-all;}
-.pbar{width:100%;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin:8px 0;}
-.pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s;}
-.tc{padding:18px;cursor:pointer;position:relative;overflow:hidden;}.tc:hover{border-color:rgba(255,107,53,.25);transform:translateY(-2px);box-shadow:0 6px 24px rgba(255,107,53,.08);}
-.dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
-.dot-r{background:var(--green);box-shadow:0 0 8px rgba(34,197,94,.5);animation:pulse 2s infinite;}
-.dot-i{background:var(--text3);}.dot-e{background:var(--red);}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-.bh{background:rgba(239,68,68,.12);color:#f87171;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;display:inline-block;}
-.bw{background:rgba(245,158,11,.12);color:#fbbf24;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;display:inline-block;}
-.bc{background:rgba(59,130,246,.12);color:#60a5fa;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;display:inline-block;}
-.bie{background:rgba(122,122,148,.12);color:#7a7a94;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;display:inline-block;}
-.sbar{width:50px;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:6px;}
-.toast-c{position:fixed;top:68px;right:20px;z-index:200;display:flex;flex-direction:column;gap:6px;}
-.toast{padding:10px 16px;border-radius:9px;font-size:12px;font-weight:500;animation:sIn .3s;max-width:340px;}
-.toast-s{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2);}
-.toast-e{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2);}
-.toast-i{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2);}
-@keyframes sIn{from{transform:translateX(80px);opacity:0;}to{transform:translateX(0);opacity:1;}}
-.skel{background:linear-gradient(90deg,rgba(255,255,255,.03) 25%,rgba(255,255,255,.06) 50%,rgba(255,255,255,.03) 75%);background-size:200% 100%;animation:shim 1.5s infinite;border-radius:6px;}
-@keyframes shim{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-.spin{animation:sp 1s linear infinite;}@keyframes sp{to{transform:rotate(360deg);}}
-@media(max-width:1024px){.sb{transform:translateX(-240px);}.sb.mob{transform:translateX(0);}.mc{margin-left:0!important;}}
-@media(max-width:640px){.pg{padding:12px;}}
-</style>
+    <title>Blaze OS Chat</title>
+    <style>
+        body { background: #0f0f1a; color: #fff; font-family: Arial; margin: 0; padding: 20px; }
+        .chat-container { max-width: 600px; margin: 0 auto; background: #1a1a2e; border-radius: 12px; overflow: hidden; }
+        .chat-header { background: #252542; padding: 15px; display: flex; align-items: center; gap: 10px; }
+        .online { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; }
+        .messages { height: 400px; overflow-y: auto; padding: 15px; }
+        .message { margin: 10px 0; padding: 10px 14px; border-radius: 12px; max-width: 80%; }
+        .user { background: #3b82f6; margin-left: auto; }
+        .bot { background: #ff6b35; }
+        .input-area { display: flex; padding: 15px; background: #252542; gap: 10px; }
+        input { flex: 1; padding: 12px; border: none; border-radius: 8px; background: #0f0f1a; color: #fff; }
+        button { padding: 12px 24px; background: #ff6b35; border: none; border-radius: 8px; color: #fff; cursor: pointer; }
+        .timestamp { font-size: 11px; color: #888; margin-top: 4px; }
+    </style>
 </head>
 <body>
-<div class="toast-c" id="TC"></div>
-
-<!-- SIDEBAR -->
-<aside class="sb" id="SB">
-<div style="padding:16px 16px 10px;display:flex;align-items:center;gap:10px;">
-<div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#ff6b35,#f7931e);display:flex;align-items:center;justify-content:center;font-size:18px;">🔥</div>
-<div><div style="font-size:15px;font-weight:800;letter-spacing:-.5px;">Blaze<span style="color:var(--accent)">OS</span></div><div style="font-size:9px;color:var(--text3);font-weight:600;">ENTERPRISE v2.0</div></div>
-</div>
-<div class="ns">Command Center</div>
-<div class="ni a" data-p="dashboard" onclick="nav('dashboard')">📊 Dashboard</div>
-<div class="ni" data-p="leads" onclick="nav('leads')">🎯 Leads</div>
-<div class="ni" data-p="agents" onclick="nav('agents')">🤖 Agents</div>
-<div class="ni" data-p="tasks" onclick="nav('tasks')">📋 Tasks</div>
-<div class="ns">Integrations</div>
-<div class="ni" data-p="systeme" onclick="nav('systeme')">🔗 Systeme.io</div>
-<div class="ni" data-p="stores" onclick="nav('stores')">🛒 Shopify Stores</div>
-<div class="ni" data-p="whatsapp" onclick="nav('whatsapp')">💬 WhatsApp Chat</div>
-<div class="ns">Execution</div>
-<div class="ni" data-p="tools" onclick="nav('tools')">🛠️ Tools (14)</div>
-<div class="ni" data-p="outreach" onclick="nav('outreach')">📧 AI Outreach</div>
-<div class="ni" data-p="campaigns" onclick="nav('campaigns')">📬 Campaigns</div>
-<div class="ns">System</div>
-<div class="ni" data-p="settings" onclick="nav('settings')">⚙️ Settings</div>
-<div style="margin-top:auto;padding:14px 16px;border-top:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:9px;">
-<div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#ff6b35,#f7931e);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">Z</div>
-<div><div style="font-size:12px;font-weight:600;">Zain Moolla</div><div style="font-size:10px;color:var(--text3);">Blaze Ignite</div></div>
-</div>
-</aside>
-
-<!-- MAIN -->
-<div class="mc" id="MC">
-
-<!-- TOPBAR -->
-<div class="tb">
-<div style="display:flex;align-items:center;gap:14px;">
-<button onclick="toggleSB()" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;">☰</button>
-<div><div style="font-size:15px;font-weight:700;" id="PT">Dashboard</div><div style="font-size:10px;color:var(--text3);" id="PS">Command Center</div></div>
-</div>
-<div style="display:flex;align-items:center;gap:10px;">
-<span style="font-size:11px;color:var(--text3);" id="CLK"></span>
-<div id="STS" style="display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(239,68,68,.1);color:#f87171;"><span class="dot dot-e"></span>OFFLINE</div>
-<span id="UPD" style="font-size:10px;color:var(--text3);"></span>
-</div>
-</div>
-
-<!-- ═══ DASHBOARD ═══ -->
-<div class="pg a" id="pg-dashboard">
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;" id="statsGrid"></div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;" id="dashAgents"></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
-<div class="g" style="padding:18px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><span style="font-size:13px;font-weight:700;">Recent Leads</span><button class="btn btn-xs btn-g" onclick="nav('leads')">View All →</button></div><div id="dashLeads"></div></div>
-<div class="g" style="padding:18px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><span style="font-size:13px;font-weight:700;">Active Tasks</span><button class="btn btn-xs btn-g" onclick="nav('tasks')">View All →</button></div><div id="dashTasks"></div></div>
-</div>
-<div style="display:flex;flex-wrap:wrap;gap:8px;">
-<button class="btn btn-p" onclick="openAddLead()">+ Add Lead</button>
-<button class="btn btn-g" onclick="syncSysteme()">🔗 Sync Systeme.io</button>
-<button class="btn btn-g" onclick="seedDB()">🌱 Seed DB</button>
-<button class="btn btn-g" onclick="loadAll()">🔄 Refresh</button>
-</div>
-</div>
-
-<!-- ═══ LEADS ═══ -->
-<div class="pg" id="pg-leads">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-<div style="display:flex;gap:6px;flex-wrap:wrap;" id="leadFilters"></div>
-<div style="display:flex;gap:8px;"><input type="text" class="fi" placeholder="Search..." style="width:200px;padding:6px 12px;font-size:12px;" id="leadSearch" oninput="renderLeads()"><button class="btn btn-p btn-s" onclick="openAddLead()">+ Add Lead</button></div>
-</div>
-<div class="g" style="overflow-x:auto;"><table class="dt" style="width:100%;"><thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Score</th><th>Tier</th><th>Source</th><th>Actions</th></tr></thead><tbody id="leadsTB"></tbody></table></div>
-<div style="margin-top:10px;font-size:11px;color:var(--text3);" id="leadsCount"></div>
-</div>
-
-<!-- ═══ AGENTS ═══ -->
-<div class="pg" id="pg-agents">
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;" id="agentsGrid"></div>
-</div>
-
-<!-- ═══ TASKS ═══ -->
-<div class="pg" id="pg-tasks">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
-<div style="display:flex;gap:6px;" id="taskFilters"></div>
-<button class="btn btn-p btn-s" onclick="openAddTask()">+ Add Task</button>
-</div>
-<div id="tasksList"></div>
-</div>
-
-<!-- ═══ SYSTEME.IO ═══ -->
-<div class="pg" id="pg-systeme">
-<div class="g" style="padding:20px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-<div><div style="font-size:16px;font-weight:700;">Systeme.io Integration</div><div style="font-size:12px;color:var(--text2);margin-top:3px;">Two-way contact sync — auto-runs every 15 minutes</div></div>
-<div style="display:flex;gap:8px;"><button class="btn btn-p" onclick="syncSysteme()" id="syncBtn">🔗 Full Sync</button><button class="btn btn-g" onclick="pullSysteme()">⬇️ Pull Contacts</button></div>
-</div>
-<div class="g" style="padding:18px;"><div style="font-size:13px;font-weight:700;margin-bottom:12px;">Sync Log</div><div class="term" id="syncLog" style="color:var(--text2);max-height:200px;">Waiting for sync...</div></div>
-</div>
-
-<!-- ═══ STORES ═══ -->
-<div class="pg" id="pg-stores">
-
-<!-- ═══ WHATSAPP CHAT ═══ -->
-<div class="pg" id="pg-whatsapp">
-<div style="display:flex;height:calc(100vh - 96px);gap:0;overflow:hidden;border-radius:14px;border:1px solid rgba(255,255,255,.05);">
-<!-- Inbox Sidebar -->
-<div style="width:320px;min-width:280px;background:rgba(15,15,26,.8);border-right:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;" id="waInbox">
-<div style="padding:14px;border-bottom:1px solid rgba(255,255,255,.05);">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-size:15px;font-weight:700;">💬 Chats</span><span style="font-size:11px;color:var(--text3);" id="waConvoCount"></span></div>
-<input type="text" class="fi" placeholder="Search conversations..." style="padding:7px 12px;font-size:12px;" id="waSearch" oninput="renderConvoList()">
-</div>
-<div style="flex:1;overflow-y:auto;" id="waConvoList"></div>
-</div>
-<!-- Chat Window -->
-<div style="flex:1;display:flex;flex-direction:column;background:rgba(7,7,13,.6);">
-<!-- Chat Header -->
-<div style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;" id="waChatHeader">
-<div style="display:flex;align-items:center;gap:10px;">
-<div style="width:36px;height:36px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:16px;" id="waChatAvatar">💬</div>
-<div><div style="font-size:14px;font-weight:600;" id="waChatName">Select a conversation</div><div style="font-size:10px;color:var(--text3);" id="waChatPhone"></div></div>
-</div>
-<div style="display:flex;gap:6px;">
-<button class="btn btn-xs btn-g" onclick="markConvoRead()" title="Mark as read">✓ Read</button>
-</div>
-</div>
-<!-- Messages -->
-<div style="flex:1;overflow-y:auto;padding:18px;" id="waChatMessages">
-<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px;">Select a conversation to start chatting</div>
-</div>
-<!-- Input -->
-<div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,.05);display:flex;gap:10px;">
-<input type="text" class="fi" placeholder="Type a message..." style="flex:1;padding:10px 14px;" id="waInput" onkeydown="if(event.key==='Enter')sendWAMessage()">
-<button class="btn btn-p" onclick="sendWAMessage()" id="waSendBtn">Send</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- ═══ STORES (continued) ═══ -->
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;" id="storesGrid"></div>
-<div id="storeDetail" style="display:none;margin-top:16px;"></div>
-</div>
-
-<!-- ═══ TOOLS ═══ -->
-<div class="pg" id="pg-tools">
-<div style="margin-bottom:16px;"><div style="font-size:16px;font-weight:700;">Midnight Magic Tools</div><div style="font-size:12px;color:var(--text2);margin-top:3px;">14 power tools — click to execute with live output</div></div>
-<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;" id="toolCats"></div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;" id="toolsGrid"></div>
-<div style="margin-top:20px;" id="execHistory"></div>
-</div>
-
-<!-- ═══ AI OUTREACH ═══ -->
-<div class="pg" id="pg-outreach">
-<div class="g" style="padding:20px;margin-bottom:16px;">
-<div style="font-size:16px;font-weight:700;margin-bottom:14px;">AI Cold Outreach Generator</div>
-<div class="fg"><label class="fl">Select Lead</label><select class="fi" id="outLeadSel"></select></div>
-<div class="fg"><label class="fl">Template Style</label><select class="fi" id="outTemplate"><option value="">Auto (based on tier)</option><option value="value-first">Value-First</option><option value="direct">Direct Pitch</option><option value="soft">Soft Touch</option></select></div>
-<button class="btn btn-p" onclick="generateOutreach()">🧠 Generate Email</button>
-</div>
-<div id="outResult" style="display:none;"></div>
-</div>
-
-<!-- ═══ CAMPAIGNS ═══ -->
-<div class="pg" id="pg-campaigns">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-<div style="font-size:16px;font-weight:700;">Email Campaigns</div>
-<button class="btn btn-p btn-s" onclick="openAddCampaign()">+ New Campaign</button>
-</div>
-<div id="campaignsList"></div>
-</div>
-
-<!-- ═══ SETTINGS ═══ -->
-<div class="pg" id="pg-settings">
-<div class="g" style="padding:22px;max-width:550px;">
-<div style="font-size:16px;font-weight:700;margin-bottom:18px;">Configuration</div>
-<div class="fg"><label class="fl">API Base URL</label><input type="text" class="fi" id="cfgUrl" placeholder="http://localhost:3000"></div>
-<div class="fg"><label class="fl">Systeme.io API Key</label><input type="password" class="fi" id="cfgSys"></div>
-<div class="fg"><label class="fl">HeyGen API Key</label><input type="password" class="fi" id="cfgHey"></div>
-<div style="display:flex;gap:8px;margin-top:18px;">
-<button class="btn btn-p" onclick="saveSettings()">Save</button>
-<button class="btn btn-g" onclick="testConn()">Test Connection</button>
-</div>
-</div>
-</div>
-
-</div><!-- /mc -->
-
-<!-- ═══ MODAL: ADD LEAD ═══ -->
-<div class="mo" id="mLead"><div class="mo-c">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><span style="font-size:15px;font-weight:700;">Add Lead</span><button onclick="closeM('mLead')" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;">✕</button></div>
-<form onsubmit="submitLead(event)">
-<div class="fg"><label class="fl">Name *</label><input type="text" class="fi" id="lName" required></div>
-<div class="fg"><label class="fl">Company</label><input type="text" class="fi" id="lComp"></div>
-<div class="fg"><label class="fl">Email *</label><input type="email" class="fi" id="lEmail" required></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-<div class="fg"><label class="fl">Score</label><input type="number" class="fi" id="lScore" min="0" max="100" value="50"></div>
-<div class="fg"><label class="fl">Tier</label><select class="fi" id="lTier"><option value="HOT">🔥 Hot</option><option value="WARM" selected>🟡 Warm</option><option value="COLD">🔵 Cold</option><option value="ICE">🧊 Ice</option></select></div>
-</div>
-<div class="fg"><label class="fl">Source</label><select class="fi" id="lSrc"><option value="manual">Manual</option><option value="linkedin">LinkedIn</option><option value="instagram">Instagram</option><option value="referral">Referral</option><option value="website">Website</option><option value="cold-email">Cold Email</option><option value="systeme.io">Systeme.io</option><option value="scraper">Scraper</option></select></div>
-<div style="display:flex;gap:8px;margin-top:16px;"><button type="submit" class="btn btn-p" style="flex:1;">Add Lead</button><button type="button" class="btn btn-g" onclick="closeM('mLead')">Cancel</button></div>
-</form>
-</div></div>
-
-<!-- ═══ MODAL: ADD TASK ═══ -->
-<div class="mo" id="mTask"><div class="mo-c">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><span style="font-size:15px;font-weight:700;">Add Task</span><button onclick="closeM('mTask')" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;">✕</button></div>
-<form onsubmit="submitTask(event)">
-<div class="fg"><label class="fl">Title *</label><input type="text" class="fi" id="tTitle" required></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-<div class="fg"><label class="fl">Priority</label><select class="fi" id="tPri"><option value="high">🔴 High</option><option value="medium" selected>🟡 Medium</option><option value="low">🟢 Low</option></select></div>
-<div class="fg"><label class="fl">Agent</label><select class="fi" id="tAgent"><option value="hunter">🎯 Hunter</option><option value="outreach">📧 Outreach</option><option value="creator">🎨 Creator</option><option value="whatsapp">💬 WhatsApp</option></select></div>
-</div>
-<div style="display:flex;gap:8px;margin-top:16px;"><button type="submit" class="btn btn-p" style="flex:1;">Create</button><button type="button" class="btn btn-g" onclick="closeM('mTask')">Cancel</button></div>
-</form>
-</div></div>
-
-<!-- ═══ MODAL: TOOL EXECUTION ═══ -->
-<div class="mo" id="mTool"><div class="mo-c" style="max-width:700px;">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-<div style="display:flex;align-items:center;gap:10px;"><span id="mToolIcon" style="font-size:24px;"></span><div><div style="font-size:15px;font-weight:700;" id="mToolName"></div><div style="font-size:11px;color:var(--text2);" id="mToolDesc"></div></div></div>
-<button onclick="closeM('mTool')" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;">✕</button>
-</div>
-<div id="mToolParams"></div>
-<button class="btn btn-p" onclick="executeTool()" id="mToolRun" style="width:100%;justify-content:center;margin-top:10px;">▶ Run Tool</button>
-<div id="mToolProgress" style="display:none;margin-top:16px;">
-<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;"><span id="mToolPMsg">Running...</span><span id="mToolPPct">0%</span></div>
-<div class="pbar"><div class="pfill" id="mToolPBar" style="width:0%;"></div></div>
-</div>
-<div class="term" id="mToolTerm" style="display:none;margin-top:12px;"></div>
-<div id="mToolResult" style="display:none;margin-top:14px;"></div>
-</div></div>
-
-<!-- ═══ MODAL: CAMPAIGN ═══ -->
-<div class="mo" id="mCamp"><div class="mo-c">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><span style="font-size:15px;font-weight:700;">New Campaign</span><button onclick="closeM('mCamp')" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;">✕</button></div>
-<form onsubmit="submitCampaign(event)">
-<div class="fg"><label class="fl">Campaign Name *</label><input type="text" class="fi" id="cName" required></div>
-<div class="fg"><label class="fl">Type</label><select class="fi" id="cType"><option value="welcome">Welcome Series</option><option value="nurture">Nurture</option><option value="promotional">Promotional</option><option value="abandoned-cart">Abandoned Cart</option></select></div>
-<div class="fg"><label class="fl">Subject Line</label><input type="text" class="fi" id="cSubj" placeholder="Use {{first_name}} for personalization"></div>
-<div class="fg"><label class="fl">Content</label><textarea class="fi" id="cContent" placeholder="Email body..."></textarea></div>
-<div style="display:flex;gap:8px;margin-top:16px;"><button type="submit" class="btn btn-p" style="flex:1;">Create Campaign</button><button type="button" class="btn btn-g" onclick="closeM('mCamp')">Cancel</button></div>
-</form>
-</div></div>
-
-<script>
-// ═══════════════════════════════════════════════════════════════════════════════
-// BLAZE OS ENTERPRISE — FRONTEND ENGINE
-// ═══════════════════════════════════════════════════════════════════════════════
-const API=localStorage.getItem('blaze_api')||'http://localhost:3000';
-let socket,leads=[],tasks=[],agents=[],tools=[],stores=[],campaigns=[];
-let currentTool=null,currentExecId=null,leadFilter='ALL',taskFilter='all',toolCat='All';
-
-// ─── INIT ───
-document.addEventListener('DOMContentLoaded',()=>{
-  updateClock();setInterval(updateClock,1000);
-  initSocket();loadAll();loadSettings();
-});
-
-// ─── SOCKET.IO ───
-function initSocket(){
-  try{
-    socket=io(API,{transports:['websocket','polling'],reconnection:true});
-    socket.on('connect',()=>{setStatus(true);toast('Connected to Blaze OS','s');});
-    socket.on('disconnect',()=>setStatus(false));
-    socket.on('data:refresh',()=>loadAll());
-    socket.on('data:update',d=>{if(d.collection==='leads')loadLeads();if(d.collection==='tasks')loadTasks();loadStats();});
-    socket.on('agent:update',()=>loadAgents());
-    socket.on('notification',d=>toast(d.message,d.type==='error'?'e':'i'));
-    socket.on('tool:output',d=>{
-      if(d.execId===currentExecId){
-        if(d.type==='log')appendTerm(d.data.message);
-        if(d.type==='progress'){$('mToolPBar').style.width=d.data.percent+'%';$('mToolPPct').textContent=d.data.percent+'%';$('mToolPMsg').textContent=d.data.message||'Running...';}
-        if(d.type==='result')showToolResult(d.data);
-      }
-    });
-    socket.on('tool:complete',d=>{
-      if(d.execId===currentExecId){$('mToolRun').disabled=false;$('mToolRun').textContent='▶ Run Again';toast(d.status==='success'?'Tool completed!':'Tool failed','s');}
-    });
-    socket.on('sync:progress',d=>{$('syncLog').textContent+=`[sync] Page ${d.page} — ${d.total} contacts so far\n`;scrollBtm('syncLog');});
-    socket.on('sync:complete',d=>{$('syncLog').textContent+=`✅ Done: ${d.pulled} pulled, ${d.imported} imported, ${d.skipped} skipped\n`;});
-    // WhatsApp real-time
-    socket.on('whatsapp:message',d=>{
-      // Update convo list
-      if(d.conversation){
-        const ci=convos.findIndex(x=>x.id===d.conversation.id);
-        if(ci>=0)convos[ci]=d.conversation;else convos.unshift(d.conversation);
-        renderConvoList();
-      }
-      // If viewing this conversation, add message
-      if(d.message&&d.conversation&&d.conversation.id===activeConvoId){
-        // Avoid duplicates from optimistic update
-        if(d.message.direction==='incoming'){waMessages.push(d.message);renderMessages();}
-      }
-    });
-    socket.on('whatsapp:status',d=>{
-      const mi=waMessages.findIndex(m=>m.id===d.messageId||m.messageId===d.messageId);
-      if(mi>=0){waMessages[mi].status=d.status;renderMessages();}
-    });
-    socket.on('heartbeat',d=>{$('UPD').textContent=`${d.connectedClients} client${d.connectedClients!==1?'s':''} connected`;});
-  }catch(e){console.error('Socket error:',e);}
-}
-
-// ─── NAV ───
-function nav(p){
-  const T={dashboard:['Dashboard','Command Center'],leads:['Leads','Manage pipeline'],agents:['Agents','AI fleet status'],tasks:['Tasks','Track work'],systeme:['Systeme.io','Contact sync'],stores:['Shopify','Store management'],whatsapp:['WhatsApp','Live chat sync'],tools:['Tools','Midnight Magic (14)'],outreach:['AI Outreach','Smart email generation'],campaigns:['Campaigns','Email campaigns'],settings:['Settings','Configuration']};
-  document.querySelectorAll('.pg').forEach(e=>e.classList.remove('a'));
-  document.querySelectorAll('.ni').forEach(e=>e.classList.remove('a'));
-  $('pg-'+p).classList.add('a');
-  document.querySelector(`.ni[data-p="${p}"]`)?.classList.add('a');
-  $('PT').textContent=T[p]?.[0]||'';$('PS').textContent=T[p]?.[1]||'';
-  if(innerWidth<=1024)$('SB').classList.remove('mob');
-  if(p==='outreach')populateOutreachLeads();
-}
-function toggleSB(){const s=$('SB');innerWidth<=1024?s.classList.toggle('mob'):(s.classList.toggle('sb-h'),$('MC').classList.toggle('mc-full'));}
-
-// ─── API ───
-async function api(ep,opts={}){
-  const r=await fetch(API+ep,{headers:{'Content-Type':'application/json',...opts.headers},...opts});
-  if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json();
-}
-
-// ─── LOAD ALL ───
-async function loadAll(){
-  try{await Promise.all([loadStats(),loadLeads(),loadAgents(),loadTasks(),loadTools(),loadStores(),loadCampaigns(),loadConversations()]);setStatus(true);}
-  catch(e){console.error(e);setStatus(false);toast('Connection failed: '+e.message,'e');}
-}
-
-function setStatus(on){const e=$('STS');e.innerHTML=`<span class="dot ${on?'dot-r':'dot-e'}"></span>${on?'ONLINE':'OFFLINE'}`;e.style.background=on?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)';e.style.color=on?'#4ade80':'#f87171';}
-
-// ─── STATS ───
-async function loadStats(){
-  const r=await api('/api/stats');const d=r.data;
-  const cards=[
-    {l:'Total Leads',v:d.totalLeads,i:'🎯',c:'#ff6b35'},
-    {l:'Revenue (est.)',v:'R'+d.revenue?.toLocaleString(),i:'💰',c:'#22c55e'},
-    {l:'Hot Leads',v:d.hotLeads,i:'🔥',c:'#ef4444'},
-    {l:'Active Agents',v:`${d.activeAgents}/${d.totalAgents}`,i:'🤖',c:'#3b82f6'},
-    {l:'Pending Tasks',v:d.pendingTasks,i:'📋',c:'#f59e0b'},
-    {l:'Stores',v:d.connectedStores,i:'🛒',c:'#8b5cf6'},
-  ];
-  $('statsGrid').innerHTML=cards.map(c=>`<div class="g sc"><div class="sl">${c.l}</div><div style="display:flex;justify-content:space-between;align-items:center;"><div class="sv">${c.v}</div><div style="width:38px;height:38px;border-radius:10px;background:${c.c}15;display:flex;align-items:center;justify-content:center;font-size:18px;">${c.i}</div></div></div>`).join('');
-}
-
-// ─── LEADS ───
-async function loadLeads(){const r=await api('/api/leads');leads=r.data||[];renderLeads();renderDashLeads();}
-function renderLeads(){
-  const q=($('leadSearch')?.value||'').toLowerCase();
-  let f=leads;
-  if(leadFilter!=='ALL')f=f.filter(l=>l.tier===leadFilter);
-  if(q)f=f.filter(l=>(l.name||'').toLowerCase().includes(q)||(l.company||'').toLowerCase().includes(q)||(l.email||'').toLowerCase().includes(q));
-  // Filters
-  const tiers=['ALL','HOT','WARM','COLD','ICE'];
-  $('leadFilters').innerHTML=tiers.map(t=>`<button class="btn btn-xs ${leadFilter===t?'btn-p':'btn-g'}" onclick="leadFilter='${t}';renderLeads()">${t==='ALL'?'All':t}</button>`).join('');
-  $('leadsTB').innerHTML=f.length?f.map(l=>{
-    const sc=l.score>=80?'#22c55e':l.score>=50?'#f59e0b':l.score>=25?'#3b82f6':'#7a7a94';
-    const tb=l.tier==='HOT'?'bh':l.tier==='WARM'?'bw':l.tier==='COLD'?'bc':'bie';
-    return `<tr><td style="font-weight:600;">${esc(l.name)}</td><td style="color:var(--text2);">${esc(l.company||'—')}</td><td style="font-size:12px;">${esc(l.email)}</td><td><span style="font-weight:600;color:${sc};">${l.score}</span><div class="sbar"><div style="width:${l.score}%;height:100%;border-radius:3px;background:${sc};"></div></div></td><td><span class="${tb}">${l.tier}</span></td><td style="color:var(--text3);font-size:12px;">${esc(l.source||'—')}</td><td><button class="btn btn-xs btn-d" onclick="delLead('${l.id}')">✕</button></td></tr>`;
-  }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">No leads</td></tr>';
-  $('leadsCount').textContent=f.length+' leads';
-}
-function renderDashLeads(){
-  $('dashLeads').innerHTML=leads.slice(0,5).map(l=>{
-    const tb=l.tier==='HOT'?'bh':l.tier==='WARM'?'bw':l.tier==='COLD'?'bc':'bie';
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.03);"><div><div style="font-size:12px;font-weight:600;">${esc(l.name)}</div><div style="font-size:10px;color:var(--text3);">${esc(l.company||'')}</div></div><span class="${tb}">${l.tier}</span></div>`;
-  }).join('')||'<div style="color:var(--text3);font-size:12px;">No leads yet</div>';
-}
-function openAddLead(){$('mLead').classList.add('show');}
-async function submitLead(e){
-  e.preventDefault();
-  await api('/api/leads',{method:'POST',body:JSON.stringify({name:$('lName').value,company:$('lComp').value,email:$('lEmail').value,score:+$('lScore').value,tier:$('lTier').value,source:$('lSrc').value})});
-  closeM('mLead');e.target.reset();toast('Lead added!','s');loadLeads();loadStats();
-}
-async function delLead(id){if(!confirm('Delete?'))return;await api('/api/leads/'+id,{method:'DELETE'});toast('Deleted','s');loadLeads();loadStats();}
-
-// ─── AGENTS ───
-async function loadAgents(){const r=await api('/api/agents');agents=r.data||[];renderAgents();renderDashAgents();}
-function renderAgents(){
-  $('agentsGrid').innerHTML=agents.map(a=>{
-    const dc=a.status==='running'?'dot-r':a.status==='error'?'dot-e':'dot-i';
-    const sk=a.stats?.leadsFound!=null?`${a.stats.leadsFound} found`:a.stats?.messagesSent!=null?`${a.stats.messagesSent} sent`:a.stats?.contentCreated!=null?`${a.stats.contentCreated} created`:a.stats?.conversations!=null?`${a.stats.conversations} convos`:'—';
-    return `<div class="g ac">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
-        <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:26px;">${a.icon||'🤖'}</span><div><div style="font-size:14px;font-weight:700;">${esc(a.name)}</div><div style="font-size:11px;color:var(--text2);">${esc(a.role||'')}</div></div></div>
-        <div style="display:flex;align-items:center;gap:5px;"><span class="dot ${dc}"></span><span style="font-size:10px;font-weight:600;text-transform:uppercase;color:${a.status==='running'?'var(--green)':a.status==='error'?'var(--red)':'var(--text3)'};">${a.status}</span></div>
-      </div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">${sk}</div>
-      ${a.currentTask?`<div style="font-size:11px;color:var(--accent);margin-bottom:8px;">▶ ${esc(a.currentTask)}</div>`:''}
-      <button class="btn btn-s ${a.status==='running'?'btn-d':'btn-p'}" onclick="toggleAgent('${a.id}','${a.status}')">${a.status==='running'?'⏸ Pause':'▶ Start'}</button>
-    </div>`;
-  }).join('');
-}
-function renderDashAgents(){
-  $('dashAgents').innerHTML=agents.map(a=>{
-    const dc=a.status==='running'?'dot-r':'dot-i';
-    return `<div class="g" style="padding:12px;display:flex;align-items:center;gap:10px;"><span style="font-size:18px;">${a.icon||'🤖'}</span><div style="flex:1;font-size:12px;font-weight:600;">${esc(a.name)}</div><span class="dot ${dc}"></span></div>`;
-  }).join('');
-}
-async function toggleAgent(id,s){
-  await api('/api/agents/'+id,{method:'PUT',body:JSON.stringify({status:s==='running'?'idle':'running'})});
-  toast(s==='running'?'Agent paused':'Agent started','s');loadAgents();
-}
-
-// ─── TASKS ───
-async function loadTasks(){const r=await api('/api/tasks');tasks=r.data||[];renderTasks();renderDashTasks();}
-function renderTasks(){
-  const fltrs=['all','pending','in-progress','done'];
-  $('taskFilters').innerHTML=fltrs.map(f=>`<button class="btn btn-xs ${taskFilter===f?'btn-p':'btn-g'}" onclick="taskFilter='${f}';renderTasks()">${f==='all'?'All':f}</button>`).join('');
-  const ft=taskFilter==='all'?tasks:tasks.filter(t=>t.status===taskFilter);
-  $('tasksList').innerHTML=ft.length?ft.map(t=>{
-    const pc=t.priority==='high'?'var(--red)':t.priority==='medium'?'var(--yellow)':'var(--green)';
-    return `<div class="g" style="padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;${t.status==='done'?'opacity:.5;':''}">
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:180px;"><div style="width:7px;height:7px;border-radius:50%;background:${pc};"></div><div><div style="font-size:13px;font-weight:600;${t.status==='done'?'text-decoration:line-through;':''}">${esc(t.title)}</div><div style="font-size:10px;color:var(--text3);">Agent: ${esc(t.agent||'—')} · ${esc(t.priority)}</div></div></div>
-      <div style="display:flex;gap:5px;">${t.status!=='done'?`<button class="btn btn-xs btn-g" onclick="updTask('${t.id}','${t.status==='pending'?'in-progress':'done'}')">${t.status==='pending'?'▶ Start':'✓ Done'}</button>`:''}<button class="btn btn-xs btn-d" onclick="delTask('${t.id}')">✕</button></div>
-    </div>`;
-  }).join(''):'<div class="g" style="padding:30px;text-align:center;color:var(--text3);">No tasks</div>';
-}
-function renderDashTasks(){
-  const pt=tasks.filter(t=>t.status!=='done').slice(0,4);
-  $('dashTasks').innerHTML=pt.length?pt.map(t=>{
-    const pc=t.priority==='high'?'var(--red)':t.priority==='medium'?'var(--yellow)':'var(--green)';
-    return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.03);"><div style="width:6px;height:6px;border-radius:50%;background:${pc};"></div><div style="font-size:12px;flex:1;">${esc(t.title)}</div><span style="font-size:9px;color:var(--text3);">${esc(t.status)}</span></div>`;
-  }).join(''):'<div style="font-size:12px;color:var(--text3);">No pending tasks</div>';
-}
-function openAddTask(){$('mTask').classList.add('show');}
-async function submitTask(e){e.preventDefault();await api('/api/tasks',{method:'POST',body:JSON.stringify({title:$('tTitle').value,priority:$('tPri').value,agent:$('tAgent').value})});closeM('mTask');e.target.reset();toast('Task created!','s');loadTasks();loadStats();}
-async function updTask(id,s){await api('/api/tasks/'+id,{method:'PUT',body:JSON.stringify({status:s})});loadTasks();loadStats();}
-async function delTask(id){if(!confirm('Delete?'))return;await api('/api/tasks/'+id,{method:'DELETE'});loadTasks();loadStats();}
-
-// ─── TOOLS ───
-async function loadTools(){const r=await api('/api/tools');tools=r.data||[];renderTools();}
-function renderTools(){
-  const cats=[...new Set(['All',...tools.map(t=>t.category)])];
-  $('toolCats').innerHTML=cats.map(c=>`<button class="btn btn-xs ${toolCat===c?'btn-p':'btn-g'}" onclick="toolCat='${c}';renderTools()">${c}</button>`).join('');
-  const ft=toolCat==='All'?tools:tools.filter(t=>t.category===toolCat);
-  $('toolsGrid').innerHTML=ft.map((t,i)=>`<div class="g tc" onclick="openTool('${t.id}')">
-    <div style="font-size:26px;margin-bottom:10px;">${t.icon}</div>
-    <div style="font-size:13px;font-weight:700;margin-bottom:3px;">${t.name}</div>
-    <div style="font-size:11px;color:var(--text2);line-height:1.4;">${t.description}</div>
-    <div style="margin-top:10px;display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;border-radius:50%;background:${t.color};"></div><span style="font-size:9px;color:var(--text3);font-weight:600;">${t.category}</span></div>
-  </div>`).join('');
-  loadExecHistory();
-}
-async function loadExecHistory(){
-  try{
-    const r=await api('/api/executions');const execs=(r.data||[]).slice(0,10);
-    if(!execs.length){$('execHistory').innerHTML='';return;}
-    $('execHistory').innerHTML=`<div class="g" style="padding:18px;"><div style="font-size:13px;font-weight:700;margin-bottom:12px;">Recent Executions</div>${execs.map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px;"><div><span style="font-weight:600;">${esc(e.toolName||e.toolId)}</span><span style="color:var(--text3);margin-left:8px;">${new Date(e.startedAt).toLocaleTimeString()}</span></div><span style="font-size:10px;font-weight:600;color:${e.status==='success'?'var(--green)':e.status==='running'?'var(--accent)':'var(--red)'};">${e.status?.toUpperCase()}</span></div>`).join('')}</div>`;
-  }catch(e){}
-}
-function openTool(id){
-  const t=tools.find(x=>x.id===id);if(!t)return;
-  currentTool=t;currentExecId=null;
-  $('mToolIcon').textContent=t.icon;$('mToolName').textContent=t.name;$('mToolDesc').textContent=t.description;
-  $('mToolParams').innerHTML=(t.params||[]).map(p=>`<div class="fg"><label class="fl">${p.label}${p.required?' *':''}</label>${p.type==='select'?`<select class="fi" id="tp_${p.key}">${(p.options||[]).map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`:p.type==='textarea'?`<textarea class="fi" id="tp_${p.key}" placeholder="${p.placeholder||''}"${p.required?' required':''}></textarea>`:`<input type="${p.type==='number'?'number':'text'}" class="fi" id="tp_${p.key}" placeholder="${p.placeholder||''}"${p.required?' required':''}>`}</div>`).join('');
-  $('mToolRun').disabled=false;$('mToolRun').textContent='▶ Run Tool';
-  $('mToolProgress').style.display='none';$('mToolTerm').style.display='none';$('mToolTerm').textContent='';$('mToolResult').style.display='none';$('mToolResult').innerHTML='';
-  $('mToolPBar').style.width='0%';$('mToolPPct').textContent='0%';
-  $('mTool').classList.add('show');
-}
-async function executeTool(){
-  if(!currentTool)return;
-  const params={};
-  (currentTool.params||[]).forEach(p=>{const el=$('tp_'+p.key);if(el)params[p.key]=el.value;});
-  $('mToolRun').disabled=true;$('mToolRun').textContent='⏳ Running...';
-  $('mToolProgress').style.display='block';$('mToolTerm').style.display='block';$('mToolTerm').textContent='';$('mToolResult').style.display='none';
-  try{
-    const r=await api('/api/tools/'+currentTool.id+'/execute',{method:'POST',body:JSON.stringify(params)});
-    currentExecId=r.data?.id;
-    appendTerm('⚡ Execution started: '+currentExecId);
-  }catch(e){toast('Execution failed: '+e.message,'e');$('mToolRun').disabled=false;$('mToolRun').textContent='▶ Run Tool';}
-}
-function appendTerm(msg){const t=$('mToolTerm');t.textContent+=msg+'\n';t.scrollTop=t.scrollHeight;}
-function showToolResult(data){
-  $('mToolResult').style.display='block';
-  $('mToolResult').innerHTML=`<div class="g" style="padding:16px;"><div style="font-size:12px;font-weight:700;margin-bottom:10px;color:var(--accent);">📋 Result</div><pre style="font-size:11px;color:var(--text2);white-space:pre-wrap;max-height:300px;overflow-y:auto;font-family:'JetBrains Mono',monospace;">${esc(JSON.stringify(data,null,2))}</pre></div>`;
-}
-
-// ─── SYSTEME.IO ───
-async function syncSysteme(){
-  $('syncLog').textContent='['+time()+'] Starting full sync...\n';
-  try{const r=await api('/api/systeme/sync',{method:'POST'});$('syncLog').textContent+=`[${time()}] ✅ Pulled: ${r.data.pulled}, Imported: ${r.data.imported}, Skipped: ${r.data.skipped}\n`;toast('Sync complete!','s');loadLeads();loadStats();}
-  catch(e){$('syncLog').textContent+=`[${time()}] ❌ ${e.message}\n`;toast('Sync failed','e');}
-}
-async function pullSysteme(){
-  try{const r=await api('/api/systeme/contacts');toast(`Loaded ${(r.data?.items||[]).length} contacts`,'s');}
-  catch(e){toast('Pull failed: '+e.message,'e');}
-}
-
-// ─── STORES ───
-async function loadStores(){const r=await api('/api/stores');stores=r.data||[];renderStores();}
-function renderStores(){
-  $('storesGrid').innerHTML=stores.map(s=>`<div class="g" style="padding:18px;">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;"><div><div style="font-size:15px;font-weight:700;">${esc(s.name)}</div><div style="font-size:11px;color:var(--text2);">${esc(s.url)}</div></div><span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:${s.status==='connected'?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)'};color:${s.status==='connected'?'#4ade80':'#f87171'};">${s.status}</span></div>
-    ${s.metrics?`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
-      <div><div style="font-size:10px;color:var(--text3);">Revenue</div><div style="font-size:16px;font-weight:700;">R${(s.metrics.revenue||0).toLocaleString()}</div></div>
-      <div><div style="font-size:10px;color:var(--text3);">Orders</div><div style="font-size:16px;font-weight:700;">${s.metrics.orders||0}</div></div>
-      <div><div style="font-size:10px;color:var(--text3);">Products</div><div style="font-size:16px;font-weight:700;">${s.metrics.products||0}</div></div>
-    </div>`:''}
-    ${s.auditScore?`<div style="font-size:11px;color:var(--text2);margin-bottom:10px;">Audit Score: <span style="font-weight:700;color:${s.auditScore>=80?'var(--green)':s.auditScore>=60?'var(--yellow)':'var(--red)'};">${s.auditScore}/100</span></div>`:''}
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button class="btn btn-xs btn-p" onclick="openTool('shopify-auditor')">Run Audit</button>
-      <button class="btn btn-xs btn-g" onclick="viewProducts('${s.id}')">Products</button>
-      <button class="btn btn-xs btn-g" onclick="viewOrders('${s.id}')">Orders</button>
-      <button class="btn btn-xs btn-g" onclick="viewBundles('${s.id}')">Bundles</button>
-    </div>
-  </div>`).join('')||'<div class="g" style="padding:30px;text-align:center;color:var(--text3);">No stores connected</div>';
-}
-async function viewProducts(id){
-  toast('Loading products...','i');
-  try{const r=await api(`/api/stores/${id}/products`);const p=r.data||[];
-  $('storeDetail').style.display='block';
-  $('storeDetail').innerHTML=`<div class="g" style="padding:18px;"><div style="font-size:14px;font-weight:700;margin-bottom:14px;">Products (${p.length})</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">${p.slice(0,30).map(pr=>`<div class="g" style="padding:12px;"><img src="${pr.image?.src||''}" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;background:var(--bg3);"><div style="font-size:12px;font-weight:600;">${esc(pr.title)}</div><div style="font-size:11px;color:var(--accent);margin-top:4px;">R${pr.variants?.[0]?.price||'0'}</div></div>`).join('')}</div></div>`;}
-  catch(e){toast('Failed: '+e.message,'e');}
-}
-async function viewOrders(id){
-  toast('Loading orders...','i');
-  try{const r=await api(`/api/stores/${id}/orders`);const o=r.data||[];
-  $('storeDetail').style.display='block';
-  $('storeDetail').innerHTML=`<div class="g" style="padding:18px;"><div style="font-size:14px;font-weight:700;margin-bottom:14px;">Recent Orders (${o.length})</div><table class="dt"><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th></tr></thead><tbody>${o.slice(0,20).map(or=>`<tr><td style="font-weight:600;">${or.name||or.id}</td><td>${or.customer?`${or.customer.first_name||''} ${or.customer.last_name||''}`:'Guest'}</td><td style="color:var(--accent);">R${or.total_price}</td><td style="font-size:11px;">${or.financial_status}</td><td style="color:var(--text3);font-size:11px;">${new Date(or.created_at).toLocaleDateString()}</td></tr>`).join('')}</tbody></table></div>`;}
-  catch(e){toast('Failed: '+e.message,'e');}
-}
-async function viewBundles(id){
-  toast('Generating bundle suggestions...','i');
-  try{const r=await api(`/api/stores/${id}/bundle-suggestions`);const b=r.data||[];
-  $('storeDetail').style.display='block';
-  $('storeDetail').innerHTML=`<div class="g" style="padding:18px;"><div style="font-size:14px;font-weight:700;margin-bottom:14px;">Bundle Suggestions</div>${b.map(bu=>`<div class="g" style="padding:14px;margin-bottom:10px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div style="font-size:14px;font-weight:700;">${esc(bu.name)}</div><span style="font-size:11px;color:var(--green);">${bu.discount} off</span></div><div style="font-size:12px;color:var(--text2);margin-bottom:8px;">${bu.products.map(p=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);"><span>${esc(p.title)}</span><span style="color:var(--text3);">R${p.price}</span></div>`).join('')}</div><div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;"><span>Original: R${bu.originalPrice}</span><span style="color:var(--accent);">Bundle: R${bu.bundlePrice}</span></div><div style="font-size:10px;color:var(--text3);margin-top:6px;">Target: ${bu.targetAudience} · Expected AOV: ${bu.expectedAOVIncrease}</div></div>`).join('')||'<div style="color:var(--text3);">Not enough products for bundles</div>'}</div>`;}
-  catch(e){toast('Failed: '+e.message,'e');}
-}
-
-// ─── OUTREACH ───
-function populateOutreachLeads(){
-  $('outLeadSel').innerHTML=leads.map(l=>`<option value="${l.id}">${esc(l.name)} — ${l.tier} (${l.score})</option>`).join('');
-}
-async function generateOutreach(){
-  const leadId=$('outLeadSel').value;const template=$('outTemplate').value;
-  if(!leadId){toast('Select a lead','e');return;}
-  try{
-    const r=await api('/api/outreach/generate',{method:'POST',body:JSON.stringify({leadId,template})});
-    const d=r.data;
-    $('outResult').style.display='block';
-    $('outResult').innerHTML=`<div class="g" style="padding:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div style="font-size:14px;font-weight:700;">Generated Email</div><span class="${d.lead.tier==='HOT'?'bh':d.lead.tier==='WARM'?'bw':'bc'}">${d.lead.tier} — Score: ${d.lead.score}</span></div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">TEMPLATE: ${d.template}</div>
-      <div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--text3);margin-bottom:4px;">SUBJECT</div><div style="font-size:14px;font-weight:600;padding:10px;background:rgba(255,255,255,.03);border-radius:8px;">${esc(d.email.subject)}</div></div>
-      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;">BODY</div><div style="font-size:13px;padding:14px;background:rgba(255,255,255,.03);border-radius:8px;white-space:pre-wrap;line-height:1.7;color:var(--text2);">${esc(d.email.body)}</div></div>
-      <div style="display:flex;gap:8px;margin-top:14px;"><button class="btn btn-p btn-s" onclick="toast('Email copied!','s')">📋 Copy Email</button><button class="btn btn-g btn-s" onclick="toast('Send functionality coming soon','i')">📤 Send</button></div>
-      <div style="margin-top:12px;font-size:11px;color:var(--text3);">Alternatives: ${d.alternatives.map(a=>`<button class="btn btn-xs btn-g" onclick="$('outTemplate').value='${a.key}';generateOutreach()" style="margin:2px;">${a.key}</button>`).join('')}</div>
-    </div>`;
-  }catch(e){toast('Failed: '+e.message,'e');}
-}
-
-// ─── CAMPAIGNS ───
-async function loadCampaigns(){try{const r=await api('/api/campaigns');campaigns=r.data||[];renderCampaigns();}catch(e){}}
-function renderCampaigns(){
-  $('campaignsList').innerHTML=campaigns.length?campaigns.map(c=>`<div class="g" style="padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-    <div><div style="font-size:14px;font-weight:600;">${esc(c.name)}</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Type: ${c.type} · Subject: ${esc(c.subject||'—')}</div></div>
-    <div style="display:flex;align-items:center;gap:14px;">
-      <div style="text-align:center;"><div style="font-size:16px;font-weight:700;">${c.sentCount}</div><div style="font-size:9px;color:var(--text3);">Sent</div></div>
-      <div style="text-align:center;"><div style="font-size:16px;font-weight:700;">${c.openRate}%</div><div style="font-size:9px;color:var(--text3);">Opens</div></div>
-      <div style="text-align:center;"><div style="font-size:16px;font-weight:700;">${c.clickRate}%</div><div style="font-size:9px;color:var(--text3);">Clicks</div></div>
-      <span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:${c.status==='active'?'rgba(34,197,94,.1)':'rgba(255,255,255,.05)'};color:${c.status==='active'?'#4ade80':'var(--text3)'};">${c.status}</span>
-    </div>
-  </div>`).join(''):'<div class="g" style="padding:30px;text-align:center;color:var(--text3);">No campaigns yet</div>';
-}
-function openAddCampaign(){$('mCamp').classList.add('show');}
-async function submitCampaign(e){e.preventDefault();await api('/api/campaigns',{method:'POST',body:JSON.stringify({name:$('cName').value,type:$('cType').value,subject:$('cSubj').value,content:$('cContent').value})});closeM('mCamp');e.target.reset();toast('Campaign created!','s');loadCampaigns();}
-
-// ─── WHATSAPP CHAT ───
-let convos=[],activeConvoId=null,waMessages=[];
-
-async function loadConversations(){
-  try{const r=await api('/api/whatsapp/conversations');convos=r.data||[];renderConvoList();}catch(e){console.error('WA load error:',e);}
-}
-function renderConvoList(){
-  const q=($('waSearch')?.value||'').toLowerCase();
-  let f=convos;
-  if(q)f=f.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.phone||'').includes(q)||(c.lastMessage||'').toLowerCase().includes(q));
-  $('waConvoCount').textContent=f.length+' chats';
-  $('waConvoList').innerHTML=f.length?f.map(c=>{
-    const isActive=c.id===activeConvoId;
-    const unread=c.unreadCount>0;
-    const timeStr=c.lastMessageAt?timeAgo(c.lastMessageAt):'';
-    const initial=(c.name||'?')[0].toUpperCase();
-    return `<div onclick="openConvo('${c.id}')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03);transition:background .15s;${isActive?'background:rgba(255,107,53,.08);':''}${unread?'':'opacity:.75;'}" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='${isActive?'rgba(255,107,53,.08)':''}'" >
-      <div style="width:40px;height:40px;border-radius:50%;background:${isActive?'linear-gradient(135deg,#ff6b35,#f7931e)':'var(--bg4)'};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;color:${isActive?'#fff':'var(--text2)'};">${initial}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:13px;font-weight:${unread?'700':'500'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">${esc(c.name||c.phone)}</span>
-          <span style="font-size:9px;color:var(--text3);flex-shrink:0;">${timeStr}</span>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="online"></div>
+            <span>💬 Live Chat with Blaze (Telegram)</span>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
-          <span style="font-size:11px;color:${unread?'var(--text)':'var(--text3)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;${unread?'font-weight:600;':''}">${esc(c.lastMessage||'')}</span>
-          ${unread?`<span style="background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;flex-shrink:0;">${c.unreadCount}</span>`:''}
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter')sendMessage()">
+            <button onclick="sendMessage()">Send</button>
         </div>
-      </div>
-    </div>`;
-  }).join(''):'<div style="padding:30px;text-align:center;color:var(--text3);font-size:12px;">No conversations yet</div>';
-}
-async function openConvo(id){
-  activeConvoId=id;
-  const c=convos.find(x=>x.id===id);
-  if(!c)return;
-  $('waChatName').textContent=c.name||c.phone;
-  $('waChatPhone').textContent='+'+c.phone;
-  $('waChatAvatar').textContent=(c.name||'?')[0].toUpperCase();
-  renderConvoList();
-  // Mark read
-  api('/api/whatsapp/conversations/'+id+'/read',{method:'POST'}).catch(()=>{});
-  const ci=convos.findIndex(x=>x.id===id);if(ci>=0)convos[ci].unreadCount=0;
-  // Load messages
-  try{
-    const r=await api('/api/whatsapp/conversations/'+id+'/messages');
-    waMessages=r.data||[];
-    renderMessages();
-  }catch(e){$('waChatMessages').innerHTML=`<div style="color:var(--red);padding:20px;font-size:12px;">Failed to load messages</div>`;}
-}
-function renderMessages(){
-  const el=$('waChatMessages');
-  if(!waMessages.length){el.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:12px;">No messages yet</div>';return;}
-  el.innerHTML=waMessages.map(m=>{
-    const out=m.direction==='outgoing';
-    const t=m.timestamp?new Date(m.timestamp).toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit',hour12:false}):'';
-    const statusIcon=out?(m.status==='sent'?'✓✓':m.status==='delivered'?'✓✓':'⏳'):'';
-    return `<div style="display:flex;justify-content:${out?'flex-end':'flex-start'};margin-bottom:6px;">
-      <div style="max-width:70%;padding:10px 14px;border-radius:${out?'14px 14px 4px 14px':'14px 14px 14px 4px'};background:${out?'linear-gradient(135deg,rgba(255,107,53,.2),rgba(247,147,30,.12))':'rgba(255,255,255,.06)'};font-size:13px;line-height:1.5;">
-        <div style="white-space:pre-wrap;">${esc(m.body)}</div>
-        <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:4px;font-size:9px;color:var(--text3);">${t} ${statusIcon}</div>
-      </div>
-    </div>`;
-  }).join('');
-  el.scrollTop=el.scrollHeight;
-}
-async function sendWAMessage(){
-  const input=$('waInput');
-  const body=input.value.trim();
-  if(!body||!activeConvoId)return;
-  input.value='';
-  // Optimistic UI update
-  const tempMsg={direction:'outgoing',body,timestamp:new Date().toISOString(),status:'queued',senderName:'Blaze Ignite'};
-  waMessages.push(tempMsg);
-  renderMessages();
-  // Update convo preview
-  const ci=convos.findIndex(x=>x.id===activeConvoId);
-  if(ci>=0){convos[ci].lastMessage=body;convos[ci].lastMessageAt=new Date().toISOString();}
-  renderConvoList();
-  try{
-    await api('/api/whatsapp/send',{method:'POST',body:JSON.stringify({conversationId:activeConvoId,body})});
-  }catch(e){toast('Send failed: '+e.message,'e');}
-}
-function timeAgo(ts){
-  const d=Date.now()-new Date(ts).getTime();
-  if(d<60000)return 'now';
-  if(d<3600000)return Math.floor(d/60000)+'m';
-  if(d<86400000)return Math.floor(d/3600000)+'h';
-  return Math.floor(d/86400000)+'d';
-}
+    </div>
 
-// ─── SETTINGS ───
-function loadSettings(){$('cfgUrl').value=API;$('cfgSys').value=localStorage.getItem('blaze_sys')||'';$('cfgHey').value=localStorage.getItem('blaze_hey')||'';}
-function saveSettings(){localStorage.setItem('blaze_api',$('cfgUrl').value.replace(/\/$/,''));localStorage.setItem('blaze_sys',$('cfgSys').value);localStorage.setItem('blaze_hey',$('cfgHey').value);toast('Saved! Reload to apply new API URL.','s');}
-async function testConn(){try{const r=await api('/api/health');if(r.status==='ok'){toast('Connected!','s');setStatus(true);}else throw new Error('Bad response');}catch(e){toast('Failed: '+e.message,'e');setStatus(false);}}
-async function seedDB(){try{await api('/api/seed',{method:'POST'});toast('Database reseeded!','s');loadAll();}catch(e){toast('Seed failed: '+e.message,'e');}}
-
-// ─── UTILITIES ───
-function $(id){return document.getElementById(id);}
-function closeM(id){$(id).classList.remove('show');}
-function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
-function toast(m,t='s'){const c=$('TC');const e=document.createElement('div');e.className=`toast toast-${t}`;e.textContent=m;c.appendChild(e);setTimeout(()=>e.remove(),3000);}
-function time(){return new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
-function updateClock(){$('CLK').textContent=time()+' SAST';}
-function scrollBtm(id){const e=$(id);if(e)e.scrollTop=e.scrollHeight;}
-</script>
+    <script>
+        const messagesDiv = document.getElementById('messages');
+        const API_URL = 'https://blaze-os-railway-production.up.railway.app';
+        
+        // Load messages
+        async function loadMessages() {
+            try {
+                const res = await fetch(`${API_URL}/api/messages`);
+                const data = await res.json();
+                
+                messagesDiv.innerHTML = data.data.map(m => `
+                    <div class="message ${m.sender === 'Zain' ? 'user' : 'bot'}">
+                        <div>${m.sender}</div>
+                        <div>${m.content}</div>
+                        <div class="timestamp">${new Date(m.timestamp).toLocaleTimeString()}</div>
+                    </div>
+                `).join('');
+                
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            } catch (e) {
+                console.error('Load error:', e);
+            }
+        }
+        
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            try {
+                await fetch(`${API_URL}/api/send-telegram`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                
+                input.value = '';
+                loadMessages();
+            } catch (e) {
+                alert('Failed to send: ' + e.message);
+            }
+        }
+        
+        // Auto-refresh
+        loadMessages();
+        setInterval(loadMessages, 3000);
+    </script>
 </body>
 </html>
